@@ -1,7 +1,6 @@
 package controllers
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import daos.TodoDao
 import javax.inject.{ Inject, Singleton }
@@ -23,17 +22,17 @@ class IndexController @Inject() (val todoDao: TodoDao, val messagesApi: Messages
   /**
    * 初期表示(GET)
    */
-  def get = Action {
-    Ok(views.html.index(todoForm, Await.result(todoDao.all(), Duration.Inf)))
+  def get = Action.async {
+    todoDao.all().map(todos => Ok(views.html.index(todoForm, todos)))
   }
 
   /**
    * アクション(POST)
    */
-  def post = Action { implicit request =>
+  def post = Action.async { implicit request =>
     todoForm.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(views.html.index(formWithErrors, Await.result(todoDao.all(), Duration.Inf)))
+        todoDao.all().map(todos => Ok(views.html.index(formWithErrors, todos)))
       },
       todoData => {
         val action = todoData.action.split(":")
@@ -43,7 +42,7 @@ class IndexController @Inject() (val todoDao: TodoDao, val messagesApi: Messages
           case "delete" => delete(action(1))
           case _ => println("No Action!!")
         }
-        Redirect(routes.IndexController.get)
+        todoDao.all().map(todos => Ok(views.html.index(todoForm.fill(todoData), todos)))
       })
   }
 
