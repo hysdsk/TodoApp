@@ -1,0 +1,36 @@
+@(todoForm: Form[TodoForm], list: Seq[models.Todo])(implicit messages:Messages)
+
+@main("Todo App") {
+
+    @helper.form(action = routes.IndexController.post){
+
+        @helper.inputText(todoForm("content"), '_label -> "登録内容")
+
+        <button name="action" value="insert" >登録</button>
+
+        <br />
+
+        @if(!list.isEmpty){
+        <table>
+            <thead><tr>
+                <th>No</th>
+                <th>TODO</th>
+                <th></th>
+                <th></th>
+            </tr></thead>
+            <tbody>
+                @for((todo, i) <- list.zipWithIndex){
+                <tr>
+                    <td>@(i+1)</td>
+                    <td>@todo.content</td>
+                    <td><button name="action" value="update:@todo.id">更新</button></td>
+                    <td><button name="action" value="delete:@todo.id">削除</button></td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        }
+
+    }
+
+}
