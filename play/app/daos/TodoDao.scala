@@ -17,19 +17,19 @@ class TodoDao @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
   def all(): Future[Seq[Todo]] = db.run(Todos.result)
 
   /** 登録 */
-  def insert(content: String): Future[Unit] = {
-    val todos = Todos returning Todos.map(_.id) into ((todo, id) => todo.copy(id = id)) += Todo(0, content)
+  def insert(todo: Todo): Future[Unit] = {
+    val todos = Todos returning Todos.map(_.id) into ((todo, id) => todo.copy(id = id)) += todo
     db.run(todos.transactionally).map(_ => ())
   }
 
   /** 更新 */
-  def update(id: Long, content: String): Future[Unit] = {
-    db.run(Todos.filter(_.id === id).map(_.content).update(content)).map(_ => ())
+  def update(todo: Todo): Future[Unit] = {
+    db.run(Todos.filter(_.id === todo.id).map(_.content).update(todo.content)).map(_ => ())
   }
 
   /** 削除 */
-  def delete(id: Long): Future[Unit] = {
-    db.run(Todos.filter(_.id === id).delete).map(_ => ())
+  def delete(todo: Todo): Future[Unit] = {
+    db.run(Todos.filter(_.id === todo.id).delete).map(_ => ())
   }
 
   /** マッピング */

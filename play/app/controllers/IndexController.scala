@@ -2,6 +2,7 @@ package controllers
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import models.Todo
 import daos.TodoDao
 import javax.inject.{ Inject, Singleton }
 import play.api.data.Form
@@ -47,12 +48,12 @@ class IndexController @Inject() (val todoDao: TodoDao, val messagesApi: Messages
   }
 
   /** 登録 */
-  def insert(todoForm: TodoForm) = todoDao.insert(todoForm.content)
+  def insert(todoForm: TodoForm) = todoDao.insert(Todo(0, todoForm.content))
 
   /** 更新 */
-  def update(id: String, todoForm: TodoForm) = todoDao.update(id.toLong, todoForm.content)
+  def update(id: String, todoForm: TodoForm) = todoDao.update(Todo(id.toLong, todoForm.content))
 
   /** 削除 */
-  def delete(id: String) = todoDao.delete(id.toLong)
+  def delete(id: String) = todoDao.delete(Todo(id.toLong, ""))
 
 }
